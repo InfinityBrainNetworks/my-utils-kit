@@ -30,6 +30,7 @@ _ALIGN_PREFIX   = re.compile(r"^\{align:(\w+)\}\s*(.*)", re.I)
 _PAGEBREAK_RE   = re.compile(r"^\{pagebreak\}\s*$", re.I)
 _DIRECTIVE_RE   = re.compile(r"^:::(\S+)\s*$")
 _DIRECTIVE_END  = re.compile(r"^:::\s*$")
+_IMG_INLINE_RE  = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
 
 # ── directive config: (label, header_fill, content_fill) ─────────────────────
 # Each entry drives the generic box renderer — add new directives here only.
@@ -50,6 +51,22 @@ _DIRECTIVE_CONFIG: dict[str, tuple[str, str, str]] = {
     "maths-skills":          ("MATHS SKILLS",           "1565C0", "E3F2FD"),
     "skills-link":           ("SKILLS LINK",            "37474F", "ECEFF1"),
     "international-context": ("INTERNATIONAL CONTEXT",  "1B5E20", "E8F5E9"),
+    # Phase 3 — worked content
+    "worked-example":         ("WORKED EXAMPLE",          "004D40", "E0F2F1"),
+    "worked-solution":        ("WORKED SOLUTION",          "006064", "E0F7FA"),
+    # Phase 3 — exercise / assessment
+    "activity":               ("ACTIVITY",                 "E65100", "FFF3E0"),
+    "exercise":               ("EXERCISE",                 "1A237E", "E8EAF6"),
+    "checkpoint":             ("CHECKPOINT",               "4A148C", "F3E5F5"),
+    "strengthen":             ("STRENGTHEN",               "1B5E20", "E8F5E9"),
+    "challenge":              ("CHALLENGE",                "0D47A1", "E3F2FD"),
+    "exam-style-questions":   ("EXAM-STYLE QUESTIONS",     "B71C1C", "FFEBEE"),
+    "unit-questions":         ("UNIT QUESTIONS",           "4A148C", "EDE7F6"),
+    # Phase 3 — end of chapter
+    "chapter-summary":        ("CHAPTER SUMMARY",          "37474F", "ECEFF1"),
+    "key-points":             ("KEY POINTS",               "1B5E20", "E8F5E9"),
+    # Phase 3 — margin note
+    "margin-note":            ("MARGIN NOTE",              "F57F17", "FFF9C4"),
 }
 
 
@@ -224,6 +241,12 @@ class DocxBuilder:
     # ── directive dispatcher ──────────────────────────────────────────────────
 
     def _render_directive(self, name: str, text: str):
+        if name == "figure":
+            self._render_figure(text)
+            return
+        if name == "diagram-placeholder":
+            self._render_diagram_placeholder(text)
+            return
         cfg = _DIRECTIVE_CONFIG.get(name)
         if cfg:
             label, header_fill, content_fill = cfg
@@ -237,6 +260,51 @@ class DocxBuilder:
         self._box_header(label, header_fill, "FFFFFF")
         for tok in (self._md(text) or []):
             self._block_in_box(tok, fill=content_fill, border=header_fill)
+        self.doc.add_paragraph()
+
+    def _render_figure(self, text: str):
+        lines = [ln for ln in text.strip().splitlines() if ln.strip()]
+        img_match = None
+        caption_parts: list[str] = []
+
+        for line in lines:
+            m = _IMG_INLINE_RE.search(line.strip())
+            if m and img_match is None:
+                img_match = m
+            else:
+                caption_parts.append(line.strip())
+
+        p_img = self.doc.add_paragraph()
+        p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        if img_match:
+            alt, src = img_match.group(1), img_match.group(2)
+            ph = _PLACEHOLDER_RE.match(src)
+            if ph:
+                self._image_placeholder(p_img, ph.group(1), alt)
+            else:
+                r = p_img.add_run(f"[ IMAGE: {alt or src} ]")
+                r.font.italic    = True
+                r.font.color.rgb = self._rgb("888888")
+
+        if caption_parts:
+            p_cap = self.doc.add_paragraph()
+            p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            r = p_cap.add_run(" ".join(caption_parts))
+            r.italic         = True
+            r.font.size      = Pt(9)
+            r.font.color.rgb = self._rgb("444444")
+
+        self.doc.add_paragraph()
+
+    def _render_diagram_placeholder(self, text: str):
+        p = self.doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        self._shade_p(p, "EEEEEE")
+        r = p.add_run(f"\n  [ DIAGRAM: {text.strip()} ]\n")
+        r.font.name      = "Arial"
+        r.font.size      = Pt(10)
+        r.font.color.rgb = self._rgb("666666")
+        r.italic         = True
         self.doc.add_paragraph()
 
     # ── box primitives ────────────────────────────────────────────────────────
