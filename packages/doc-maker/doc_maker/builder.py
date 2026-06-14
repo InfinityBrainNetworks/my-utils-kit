@@ -31,11 +31,26 @@ _PAGEBREAK_RE   = re.compile(r"^\{pagebreak\}\s*$", re.I)
 _DIRECTIVE_RE   = re.compile(r"^:::(\S+)\s*$")
 _DIRECTIVE_END  = re.compile(r"^:::\s*$")
 
-# Pearson palette
-BLUE      = "1B5E8C"
-BLUE_LIGHT = "D6E4F0"
-GREEN     = "1F6B42"
-GREEN_LIGHT = "D9EFE3"
+# ── directive config: (label, header_fill, content_fill) ─────────────────────
+# Each entry drives the generic box renderer — add new directives here only.
+
+_DIRECTIVE_CONFIG: dict[str, tuple[str, str, str]] = {
+    # Phase 1 — page structure
+    "learning-objectives":   ("LEARNING OBJECTIVES",   "1B5E8C", "D6E4F0"),
+    "getting-started":       ("GETTING STARTED",        "1F6B42", "D9EFE3"),
+    # Phase 2 — callout / info boxes
+    "key-term":              ("KEY TERM",               "6A1B9A", "F3E5F5"),
+    "key-terms":             ("KEY TERMS",              "6A1B9A", "F3E5F5"),
+    "subject-vocabulary":    ("SUBJECT VOCABULARY",     "00695C", "E0F2F1"),
+    "tip":                   ("TIP",                    "BF360C", "FBE9E7"),
+    "exam-tip":              ("EXAM TIP",               "B71C1C", "FFEBEE"),
+    "did-you-know":          ("DID YOU KNOW?",          "01579B", "E1F5FE"),
+    "hint":                  ("HINT",                   "E65100", "FFF8E1"),
+    "extend-your-knowledge": ("EXTEND YOUR KNOWLEDGE",  "283593", "E8EAF6"),
+    "maths-skills":          ("MATHS SKILLS",           "1565C0", "E3F2FD"),
+    "skills-link":           ("SKILLS LINK",            "37474F", "ECEFF1"),
+    "international-context": ("INTERNATIONAL CONTEXT",  "1B5E20", "E8F5E9"),
+}
 
 
 # ── preprocessing ─────────────────────────────────────────────────────────────
@@ -173,7 +188,7 @@ class DocxBuilder:
                 r = p.add_run(f"\n  [ IMAGE: {m.group(1)} ]\n")
                 r.font.name      = "Arial"
                 r.font.size      = Pt(10)
-                r.font.color.rgb = self._rgb(BLUE)
+                r.font.color.rgb = self._rgb("1B5E8C")
                 r.font.italic    = True
 
         # "CHAPTER N" label
@@ -181,12 +196,12 @@ class DocxBuilder:
             p = self.doc.add_paragraph()
             r = p.add_run(f"CHAPTER  {chapter_num}")
             r.font.size      = Pt(10)
-            r.font.color.rgb = self._rgb(BLUE)
+            r.font.color.rgb = self._rgb("1B5E8C")
             r.font.all_caps  = True
             r.font.bold      = True
 
         # Coloured rule
-        self._rule(BLUE, sz="18")
+        self._rule("1B5E8C", sz="18")
 
         # Chapter title
         if title:
@@ -194,7 +209,7 @@ class DocxBuilder:
             r = p.add_run(title)
             r.bold           = True
             r.font.size      = Pt(26)
-            r.font.color.rgb = self._rgb(BLUE)
+            r.font.color.rgb = self._rgb("1B5E8C")
 
         # Subtitle
         if subtitle:
@@ -209,31 +224,19 @@ class DocxBuilder:
     # ── directive dispatcher ──────────────────────────────────────────────────
 
     def _render_directive(self, name: str, text: str):
-        handlers = {
-            # ── Phase 1 ───────────────────────────────
-            "learning-objectives": self._dir_learning_objectives,
-            "getting-started":     self._dir_getting_started,
-        }
-        fn = handlers.get(name)
-        if fn:
-            fn(text)
+        cfg = _DIRECTIVE_CONFIG.get(name)
+        if cfg:
+            label, header_fill, content_fill = cfg
+            self._generic_box(label, header_fill, content_fill, text)
         else:
             tokens = self._md(text)
             if tokens:
                 self._render_tokens(tokens)
 
-    # ── Phase 1 directives ────────────────────────────────────────────────────
-
-    def _dir_learning_objectives(self, text: str):
-        self._box_header("LEARNING OBJECTIVES", BLUE, "FFFFFF")
+    def _generic_box(self, label: str, header_fill: str, content_fill: str, text: str):
+        self._box_header(label, header_fill, "FFFFFF")
         for tok in (self._md(text) or []):
-            self._block_in_box(tok, fill=BLUE_LIGHT, border=BLUE)
-        self.doc.add_paragraph()
-
-    def _dir_getting_started(self, text: str):
-        self._box_header("GETTING STARTED", GREEN, "FFFFFF")
-        for tok in (self._md(text) or []):
-            self._block_in_box(tok, fill=GREEN_LIGHT, border=GREEN)
+            self._block_in_box(tok, fill=content_fill, border=header_fill)
         self.doc.add_paragraph()
 
     # ── box primitives ────────────────────────────────────────────────────────
