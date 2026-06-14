@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "doc-maker"
+version = "0.1.0"
+description = "Convert custom Markdown to Word documents"
+requires-python = ">=3.10"
+dependencies = [
+    "mistune>=2.0.0,<3.0.0",
+    "python-docx>=1.1.0",
+    "typer>=0.9.0",
+]
+
+[project.scripts]
+doc-maker = "doc_maker.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["doc_maker*"]
