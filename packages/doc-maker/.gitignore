@@ -1,4 +1,5 @@
 output/
+source_docs/*.docx
 __pycache__/
 *.pyc
 *.egg-info/
