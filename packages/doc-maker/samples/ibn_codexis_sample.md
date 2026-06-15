@@ -2,6 +2,7 @@
 chapter: 1
 title: Programming
 subtitle: Algorithms, Pascal and the Evolution of Programming Languages
+grade: Grade 11
 ---
 
 :::learning-objectives
@@ -26,14 +27,48 @@ By the end of this chapter, you will be able to:
 
 Before writing any program, a programmer must fully understand the problem. Every problem can be broken down into three components: **Input** (the data provided), **Process** (the operations performed), and **Output** (the result produced). This is called **IPO decomposition**.
 
+:::key-term Input, Process and Output
+**Input:** The raw materials or data used to solve the problem.
+
+**Process:** The sequence of steps that transforms the input into the output.
+
+**Output:** The result produced after the process is complete.
+:::
+
 :::figure
 ![The Input → Process → Output model](placeholder:fig-1-1-ipo-model)
 Figure 1.1  The Input → Process → Output model
 :::
 
+:::worked-example Problem 1: Posting a Letter
+**Input:** Paper, pen, envelope, stamp, glue
+
+**Process:**
+1. Write the letter
+2. Fold and insert into envelope
+3. Paste the envelope
+4. Write recipient's address
+5. Stick the stamp
+6. Post the letter
+
+**Output:** Letter delivered to the recipient
+:::
+
+:::activity Practice — IPO Analysis
+Identify the Input, Process and Output for each of the following:
+
+11. Dividing 100 toffees equally among 20 people.
+12. Making a kite.
+13. Finding the area of a circle given its radius.
+:::
+
 ### Alternative Solutions and Solution Space
 
-Many problems have more than one correct solution. The complete set of all valid solutions for a given problem is called the **solution space**. A good programmer evaluates multiple solutions and selects the most efficient one based on speed, memory use, and readability.
+Many problems have more than one correct solution. The complete set of all valid solutions for a given problem is called the **solution space**.
+
+:::key-term Solution Space
+The complete set of all valid alternative solutions to a problem. Examining the full solution space helps you choose the most efficient solution.
+:::
 
 ## 1.2 Problem Solving Using Algorithms
 
@@ -43,7 +78,30 @@ Many problems have more than one correct solution. The complete set of all valid
 - Identify and describe the three control structures: Sequence, Selection and Repetition
 :::
 
-An algorithm is the plan you create before writing a program. Just like a recipe is a plan for cooking a meal, an algorithm is a precise, step-by-step set of instructions for solving a problem.
+An algorithm is the plan you create before writing a program. Just like a recipe is a plan for cooking a meal, an algorithm is a plan for solving a computational problem.
+
+:::key-term Algorithm
+**Algorithm:** A step-by-step procedure for solving a problem. An algorithm must be clear, unambiguous, and produce the correct result in a finite number of steps.
+:::
+
+:::worked-example Algorithm 1: Posting a Letter
+1. Write the letter
+2. Fold the letter
+3. Insert the letter into the envelope
+4. Write the address on the envelope
+5. Stick the stamp
+6. Post the letter
+
+*Steps 1–3 must be in strict order. Steps 4 and 5 can be interchanged.*
+:::
+
+:::remember
+Key fact: Pseudo code is not a programming language and cannot be run on a computer. It is a planning tool only.
+:::
+
+:::did-you-know
+Pascal was created by Niklaus Wirth in 1970 and named after the French mathematician Blaise Pascal. It was designed specifically as a teaching language.
+:::
 
 ### 1.2.1 Control Structures
 
@@ -51,15 +109,15 @@ All algorithms are built from three fundamental control structures.
 
 #### i. Sequence
 
-In a sequence, every step is executed one after another from start to finish, in strict order. There are no decisions or repetitions — each instruction runs exactly once.
+In a sequence, every step is executed one after another from start to finish, in strict order.
 
 #### ii. Selection
 
-Selection is a control structure where a step is executed only if a condition is satisfied. If the condition is false, that step is skipped or an alternative step is taken.
+Selection is a control structure where a step is executed only if a condition is satisfied.
 
 #### iii. Repetition
 
-Repetition is a control structure where one or more steps are repeated until a condition is met. This avoids writing the same instruction many times.
+Repetition is a control structure where one or more steps are repeated until a condition is met.
 
 :::figure
 ![Three Control Structures — visual summary](placeholder:fig-1-2-control-structures)
@@ -84,13 +142,14 @@ A flowchart is a diagram that shows the steps of an algorithm using standardised
 Table 1.1 — Flowchart symbols and their functions
 :::
 
-| Symbol | Shape | Function |
+| Symbol Shape | Name | Function |
 |---|---|---|
-| Terminal | Rounded rectangle | Start / End |
-| Process | Rectangle | Calculation or assignment |
-| Decision | Diamond | Yes/No condition |
-| Input/Output | Parallelogram | Read / Write data |
-| Arrow | Line with arrowhead | Direction of flow |
+| Oval / Rounded Rectangle | Start / End | Marks the beginning or end of the algorithm |
+| Parallelogram | Input / Output | Reading input from user or displaying output |
+| Rectangle | Process | A calculation, assignment or operation |
+| Diamond | Decision | A condition with Yes and No branches |
+| Arrow | Flow Direction | Shows the direction of execution |
+| Small Circle | Connector | Connects parts of the flowchart (e.g. across pages) |
 
 :::figure
 ![All flowchart symbols displayed with names](placeholder:fig-1-3-flowchart-symbols)
@@ -121,6 +180,10 @@ END
 Pseudo Code 1.1 — Area of a circle
 :::
 
+:::exam-tip
+O/L Exam Tip: Always use ENDWHILE to close a WHILE loop and UNTIL to close a REPEAT loop. Missing terminators are a common source of marks lost in exams.
+:::
+
 ## 1.4 Pascal Programming
 
 :::section-goals
@@ -130,11 +193,11 @@ Pseudo Code 1.1 — Area of a circle
 - Read and write the basic structure of a Pascal program
 :::
 
-Pascal is a high-level structured programming language designed to be easy to read and to enforce good programming habits. It uses clearly structured `BEGIN...END` blocks and requires all variables to be declared before use.
+Pascal is a high-level structured programming language designed to be easy to read and to enforce good programming habits.
 
 ### 1.4.1 Identifiers
 
-An identifier is a name used to represent a variable, constant or program in Pascal. Every identifier must follow strict naming rules.
+An identifier is a name used to represent a variable, constant or program in Pascal.
 
 :::table-note
 Table 1.3 — Rules for Pascal identifiers
@@ -151,7 +214,7 @@ Table 1.3 — Rules for Pascal identifiers
 
 #### Variables
 
-A variable is an identifier whose value can change during program execution. Variables must be declared in the `VAR` section before the `BEGIN` block.
+A variable is an identifier whose value can change during program execution.
 
 ```pascal
 VAR
@@ -182,8 +245,6 @@ Code 1.2 — Declaring constants in Pascal
 
 #### IF … THEN … ENDIF
 
-The statement(s) inside the IF block execute only if the condition is true. If the condition is false, the program skips the block and continues after ENDIF.
-
 ```pascal
 IF mark >= 50 THEN
   writeln('Pass')
@@ -195,8 +256,6 @@ Code 1.3 — IF…THEN example
 :::
 
 #### IF … THEN … ELSE … ENDIF
-
-When the condition is true, Statement 1 executes. When false, Statement 2 executes.
 
 ```pascal
 IF mark >= 50 THEN
@@ -212,11 +271,11 @@ Code 1.4 — IF…THEN…ELSE example
 
 ### 1.4.4 Repetition in Pascal
 
-Pascal provides three repetition structures. The choice depends on whether you know how many times to repeat and whether the condition is checked before or after the loop body.
+:::remember Understanding Variables vs Constants
+Use a **variable** when the value changes during execution. Use a **constant** when the value is always the same. A common mistake is declaring `PI` as a variable — it should always be a constant.
+:::
 
 #### FOR … TO … DO
-
-Used when the number of repetitions is known in advance.
 
 ```pascal
 FOR counter := 1 TO 10 DO
@@ -231,8 +290,6 @@ Code 1.5 — FOR…TO…DO loop
 
 #### WHILE … DO
 
-The WHILE loop checks its condition **before** running the loop body each time. If the condition is false at the start, the body never runs.
-
 ```pascal
 WHILE count <= 10 DO
 BEGIN
@@ -246,8 +303,6 @@ Code 1.6 — WHILE…DO loop
 :::
 
 #### REPEAT … UNTIL
-
-The REPEAT…UNTIL loop checks its condition **after** running the loop body. The body always runs at least once.
 
 ```pascal
 REPEAT
@@ -278,36 +333,35 @@ Table 1.4 — Comparison of Pascal loop structures
 - Explain the role of Assembler, Interpreter and Compiler
 :::
 
-A computer can only directly understand Machine Language — instructions in binary. All other languages must be translated before the computer can execute them.
+A computer can only directly understand Machine Language — instructions in binary.
 
 ### 1.5.1 Low-Level Programming Languages
 
 #### Machine Language
 
-Machine Language is the only language a computer understands directly. All instructions are written in binary (0s and 1s). It is machine-dependent — a program written for one processor will not work on a different processor without modification.
+Machine Language is the only language a computer understands directly. All instructions are written in binary (0s and 1s).
+
+:::key-term Machine Language
+The lowest-level programming language. Programs consist entirely of binary digits (0s and 1s). Machine language is machine-dependent — programs written for one processor will not run on a different processor without modification.
+:::
 
 #### Assembly Language
 
 Assembly Language uses short mnemonic codes (such as `MOV`, `ADD`, `JMP`) instead of binary. An **Assembler** translates Assembly Language programs into Machine Language.
 
-:::figure
-![Assembly Language → Assembler → Machine Language](placeholder:fig-1-4-assembly-to-machine)
-Figure 1.4  Assembly Language → Assembler → Machine Language
-:::
-
 ### 1.5.2 Language Translators
 
 #### Assembler
 
-Translates Assembly Language programs into Machine Language. Used only for assembly language programs.
+Translates Assembly Language programs into Machine Language.
 
 #### Interpreter
 
-Translates and executes a high-level language program **one line at a time**. If an error is found, execution stops immediately at that line. Used in Python and JavaScript.
+Translates and executes a high-level language program **one line at a time**. If an error is found, execution stops immediately at that line.
 
 #### Compiler
 
-Translates the **entire** source program into an executable file before any execution begins. If errors exist, the program does not run at all. Used in Pascal, C and Java.
+Translates the **entire** source program into an executable file before any execution begins.
 
 :::table-note
 Table 1.5 — Interpreter vs Compiler comparison
@@ -320,6 +374,10 @@ Table 1.5 — Interpreter vs Compiler comparison
 | Speed of execution | Slower (translates each run) | Faster (translated once) |
 | Output | No standalone file | Produces executable file |
 | Examples | Python, JavaScript | Pascal, C, Java |
+
+:::exam-tip
+Final Revision Checklist: Know the difference between compiler and interpreter. Know all three loop types (FOR, WHILE, REPEAT). Know the three control structures. Know IPO for any problem.
+:::
 
 {pagebreak}
 
@@ -362,15 +420,11 @@ Answer all questions. For programming questions, write complete, syntactically c
 
    (b) Converting Celsius to Fahrenheit using: F = (9/5 × C) + 32.
 
-   (c) Sorting 10 numbers from smallest to largest.
-
 2. **For each scenario, state whether it illustrates Sequence, Selection, or Repetition:**
 
    (a) A student reads each page of a 300-page textbook from page 1 to page 300.
 
    (b) A cash machine dispenses money only if the account balance is sufficient.
-
-   (c) A computer prints the numbers from 1 to 100.
 
 3. **State TWO differences between a Compiler and an Interpreter.**
 

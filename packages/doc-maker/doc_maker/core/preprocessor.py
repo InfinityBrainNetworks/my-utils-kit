@@ -24,7 +24,7 @@ _DIV_OPEN_RE   = re.compile(r"^<div[^>]*\balign=[\"'](\w+)[\"'][^>]*>", re.I)
 _DIV_CLOSE_RE  = re.compile(r"^</div>", re.I)
 _ALIGN_PREFIX  = re.compile(r"^\{align:(\w+)\}\s*(.*)", re.I)
 _PAGEBREAK_RE  = re.compile(r"^\{pagebreak\}\s*$", re.I)
-_DIRECTIVE_RE  = re.compile(r"^:::(\S+)\s*$")
+_DIRECTIVE_RE  = re.compile(r"^:::(\S+)(?:\s+(.+?))?\s*$")
 _DIRECTIVE_END = re.compile(r"^:::\s*$")
 
 
@@ -36,6 +36,7 @@ class ContentBlock:
     align: str = "left"
     is_pagebreak: bool = False
     directive: str = ""
+    directive_title: str = ""
 
 
 # ── preprocessor ──────────────────────────────────────────────────────────────
@@ -58,6 +59,7 @@ def preprocess_blocks(md_text: str) -> tuple[dict, list[ContentBlock]]:
     current_align = "left"
     in_directive = False
     dir_name = ""
+    dir_title = ""
     dir_buf: list[str] = []
 
     def flush():
@@ -72,7 +74,8 @@ def preprocess_blocks(md_text: str) -> tuple[dict, list[ContentBlock]]:
             m = _DIRECTIVE_RE.match(line)
             if m:
                 flush()
-                dir_name = m.group(1).lower()
+                dir_name  = m.group(1).lower()
+                dir_title = (m.group(2) or "").strip()
                 in_directive = True
                 dir_buf = []
                 continue
@@ -82,10 +85,12 @@ def preprocess_blocks(md_text: str) -> tuple[dict, list[ContentBlock]]:
                 blocks.append(ContentBlock(
                     "\n".join(dir_buf).strip(),
                     directive=dir_name,
+                    directive_title=dir_title,
                 ))
                 in_directive = False
-                dir_name = ""
-                dir_buf = []
+                dir_name  = ""
+                dir_title = ""
+                dir_buf   = []
             else:
                 dir_buf.append(line)
             continue

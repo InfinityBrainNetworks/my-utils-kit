@@ -46,7 +46,7 @@ class DocxBuilder:
             if block.is_pagebreak:
                 self._renderer._page_break()
             elif block.directive:
-                self._renderer.render_directive(block.directive, block.text)
+                self._renderer.render_directive(block.directive, block.text, block.directive_title)
             else:
                 self._renderer._align = ALIGN_MAP.get(
                     block.align, WD_ALIGN_PARAGRAPH.LEFT

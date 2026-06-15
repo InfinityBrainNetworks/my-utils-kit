@@ -62,7 +62,7 @@ class PearsonEdexcelRenderer(BaseRenderer):
 
     # ── directive dispatcher ──────────────────────────────────────────────────
 
-    def render_directive(self, name: str, text: str) -> None:
+    def render_directive(self, name: str, text: str, title: str = "") -> None:
         if name == "figure":
             self._render_figure(text)
             return
