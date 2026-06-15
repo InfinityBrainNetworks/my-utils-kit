@@ -290,26 +290,62 @@ class IbnCodexisRenderer(BaseRenderer):
             self._inline(p, tok.get("children", []))
 
         elif t == "list":
-            ordered = tok.get("ordered", False)
-            style   = "List Number" if ordered else "List Bullet"
-            for item in tok.get("children", []):
-                if item["type"] != "list_item":
-                    continue
-                inline: list = []
-                for child in item.get("children", []):
-                    if child["type"] in ("paragraph", "block_text"):
-                        inline.extend(child.get("children", []))
-                    else:
-                        inline.append(child)
-                p = self.doc.add_paragraph(style=style)
-                self._shade_p(p, fill)
-                self._inline(p, inline)
+            self._box_list(tok, fill)
 
         elif t == "block_code":
             self._code_block(tok.get("text", ""), tok.get("info", "") or "")
 
         elif t not in ("newline", "blank_line"):
             self.render_block(tok)
+
+    def _box_list(self, tok: dict, fill: str, depth: int = 0, counter: list | None = None) -> None:
+        """Render a list inside a box as plain shaded paragraphs with manual numbering.
+
+        Avoids Word list styles so shading is preserved and counter always starts at 1.
+        """
+        ordered = tok.get("ordered", False)
+        if counter is None:
+            counter = [0]
+
+        for item in tok.get("children", []):
+            if item["type"] != "list_item":
+                continue
+
+            inline: list = []
+            sub_lists: list = []
+            for child in item.get("children", []):
+                if child["type"] == "list":
+                    sub_lists.append(child)
+                elif child["type"] in ("paragraph", "block_text"):
+                    inline.extend(child.get("children", []))
+                else:
+                    inline.append(child)
+
+            p = self.doc.add_paragraph()
+            self._shade_p(p, fill)
+            p.paragraph_format.space_before = Pt(2)
+            p.paragraph_format.space_after  = Pt(2)
+
+            # Manual indent + hanging first-line, matching a real list appearance
+            left = 200 + depth * 360
+            hang = 280
+            pPr  = p._p.get_or_add_pPr()
+            ind  = OxmlElement("w:ind")
+            ind.set(qn("w:left"),    str(left + hang))
+            ind.set(qn("w:hanging"), str(hang))
+            pPr.append(ind)
+
+            if ordered:
+                counter[0] += 1
+                p.add_run(f"{counter[0]}.")
+            else:
+                p.add_run("•")  # bullet •
+
+            p.add_run("\t")
+            self._inline(p, inline)
+
+            for sl in sub_lists:
+                self._box_list(sl, fill, depth + 1)
 
     # ── flat label block ──────────────────────────────────────────────────────
 
