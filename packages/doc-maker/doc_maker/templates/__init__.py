@@ -8,9 +8,11 @@ To add a new template:
 """
 
 from .pearson_edexcel.renderer import PearsonEdexcelRenderer
+from .ibn_codexis.renderer import IbnCodexisRenderer
 
 REGISTRY: dict[str, type] = {
     "pearson-edexcel": PearsonEdexcelRenderer,
+    "ibn-codexis":     IbnCodexisRenderer,
 }
 
 DEFAULT_STYLE = "pearson-edexcel"

@@ -197,6 +197,38 @@ class BaseRenderer(ABC):
         shd.set(qn("w:fill"),  fill.upper())
         pPr.append(shd)
 
+    def _borders_p(self, p, *,
+                   left: tuple[str, str] | None   = None,
+                   right: tuple[str, str] | None  = None,
+                   top: tuple[str, str] | None    = None,
+                   bottom: tuple[str, str] | None = None) -> None:
+        """Add any combination of borders to a paragraph. Each arg: (hex_color, sz_str)."""
+        pPr = p._p.get_or_add_pPr()
+        for existing in pPr.findall(qn("w:pBdr")):
+            pPr.remove(existing)
+        bdr = OxmlElement("w:pBdr")
+        for side_name, value in [("left", left), ("right", right), ("top", top), ("bottom", bottom)]:
+            if value:
+                color, sz = value
+                el = OxmlElement(f"w:{side_name}")
+                el.set(qn("w:val"),   "single")
+                el.set(qn("w:sz"),    sz)
+                el.set(qn("w:space"), "4")
+                el.set(qn("w:color"), color.upper())
+                bdr.append(el)
+        if len(bdr):
+            pPr.append(bdr)
+
+    def _space_p(self, p, before: int = 0, after: int = 0) -> None:
+        """Set paragraph spacing (values in dxa — twentieths of a point)."""
+        pPr = p._p.get_or_add_pPr()
+        sp = OxmlElement("w:spacing")
+        if before:
+            sp.set(qn("w:before"), str(before))
+        if after:
+            sp.set(qn("w:after"), str(after))
+        pPr.append(sp)
+
     def _left_border(self, p, color: str, sz: str = "18") -> None:
         pPr = p._p.get_or_add_pPr()
         bdr  = OxmlElement("w:pBdr")
